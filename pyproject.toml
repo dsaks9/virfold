@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "virfold"
+version = "0.1.0"
+description = ""
+authors = ["dsaks9 <delonsaks@berkeley.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+llama-index-core = "^0.12.5"
+llama-parse = "^0.5.17"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
