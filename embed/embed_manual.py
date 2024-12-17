@@ -85,7 +85,7 @@ def create_documents_from_manual(json_path: str) -> list[Document]:
             metadata = {
                 'page_number': page_number,
                 'image_paths': image_paths,
-                'links': page_content.get('links', []),
+                'links': list(set(page_content.get('links', []))),
                 # 'charts': page_content.get('charts', []),
                 # 'items': page_content.get('items', []),
             }
