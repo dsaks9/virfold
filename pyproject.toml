@@ -4,11 +4,19 @@ version = "0.1.0"
 description = ""
 authors = ["dsaks9 <delonsaks@berkeley.edu>"]
 readme = "README.md"
+packages = [
+    {include = "embed"}
+]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.12,<3.13"
 llama-index-core = "^0.12.5"
 llama-parse = "^0.5.17"
+llama-index-embeddings-nvidia = "^0.3.0"
+llama-index-vector-stores-qdrant = "^0.4.0"
+openai = "^1.57.4"
+llama-index-embeddings-openai = "^0.3.1"
+fastembed = "^0.4.2"
 
 
 [tool.poetry.group.dev.dependencies]

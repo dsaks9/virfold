@@ -1,2 +1,4 @@
 data/
 sandbox/
+.env
+.DS_Store
