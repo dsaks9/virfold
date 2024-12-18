@@ -77,6 +77,9 @@ def create_documents_from_manual(json_path: str) -> list[Document]:
     
     try:
         for page_number, page_content in pages_dict.items():
+            if page_number in [1,2,3,4,5,6,7,8,9,10,11,12,13]:
+                continue
+            
             print(f"\nProcessing page {page_number}")
             
             image_paths = [image['path'] for image in page_content.get('images', []) if image.get('type') != 'full_page_screenshot']
@@ -85,7 +88,7 @@ def create_documents_from_manual(json_path: str) -> list[Document]:
             metadata = {
                 'page_number': page_number,
                 'image_paths': image_paths,
-                'links': list(set(page_content.get('links', []))),
+                'links': page_content.get('links', []),
                 # 'charts': page_content.get('charts', []),
                 # 'items': page_content.get('items', []),
             }

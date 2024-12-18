@@ -5,7 +5,9 @@ description = ""
 authors = ["dsaks9 <delonsaks@berkeley.edu>"]
 readme = "README.md"
 packages = [
-    {include = "embed"}
+    {include = "embed"},
+    {include = "agent"},
+    {include = "retrievers"},
 ]
 
 [tool.poetry.dependencies]
@@ -20,6 +22,9 @@ fastembed = "^0.4.2"
 arize-phoenix-otel = "^0.6.1"
 openinference-instrumentation-llama-index = "^3.1.0"
 llama-index-postprocessor-cohere-rerank = "^0.3.0"
+llama-index-llms-anthropic = "^0.6.1"
+llama-index-multi-modal-llms-anthropic = "^0.3.0"
+llama-index-readers-file = "^0.4.1"
 
 
 [tool.poetry.group.dev.dependencies]

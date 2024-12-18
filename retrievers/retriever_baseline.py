@@ -62,7 +62,7 @@ def retrieve_pages(user_input):
 
 if __name__ == "__main__":
 
-    user_input = """ Is there any information from the suppliers on the compressors being used?"""
+    user_input = """Is there any information from the suppliers on the compressors being used?"""
 
     if not user_input:
         user_input = input("Please enter your subsidy query: ")
