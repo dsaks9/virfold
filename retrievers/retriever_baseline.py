@@ -36,7 +36,7 @@ def retrieve_pages(user_input):
     Settings.embed_model = embed_model
 
     postprocessor = CohereRerank(
-        top_n=5,
+        top_n=10,
         model="rerank-v3.5",
         api_key=os.getenv('COHERE_API_KEY'),
     )
@@ -53,7 +53,7 @@ def retrieve_pages(user_input):
 
     index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
-    retriever = index.as_retriever(similarity_top_k=25)
+    retriever = index.as_retriever(similarity_top_k=100)
     nodes_embed = retriever.retrieve(user_input)
     nodes_reranked = postprocessor.postprocess_nodes(nodes=nodes_embed, query_str=user_input)
 

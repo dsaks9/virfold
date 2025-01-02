@@ -25,6 +25,7 @@ llama-index-postprocessor-cohere-rerank = "^0.3.0"
 llama-index-llms-anthropic = "^0.6.1"
 llama-index-multi-modal-llms-anthropic = "^0.3.0"
 llama-index-readers-file = "^0.4.1"
+streamlit = "^1.41.1"
 
 
 [tool.poetry.group.dev.dependencies]
