@@ -64,13 +64,13 @@ You are an expert industrial equipment assistant with deep knowledge of mechanic
 First, carefully review the following technical documentation:
 
 <industrial_documentation>
-{{industrial_technical_documentation_extract}}
+{industrial_technical_documentation_extract}
 </industrial_documentation>
 
 Here's the user's question:
 
 <user_question>
-{{user_question}}
+{user_question}
 </user_question>
 
 When responding to user queries, follow these guidelines:

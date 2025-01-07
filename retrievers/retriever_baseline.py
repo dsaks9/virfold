@@ -53,7 +53,9 @@ def retrieve_pages(user_input):
 
     index = VectorStoreIndex.from_vector_store(vector_store=vector_store)
 
-    retriever = index.as_retriever(similarity_top_k=100)
+    retriever = index.as_retriever(similarity_top_k=100,
+                                #    vector_store_query_mode="hybrid"
+                                   )
     nodes_embed = retriever.retrieve(user_input)
     nodes_reranked = postprocessor.postprocess_nodes(nodes=nodes_embed, query_str=user_input)
 
