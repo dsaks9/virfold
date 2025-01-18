@@ -9,7 +9,7 @@ import json
 project_root = str(Path(__file__).parent.parent)
 sys.path.append(project_root)
 
-from agent.agent_q_a_streaming import ManualQueryStreamingAgent, InitialProcessingEvent, RetrievalEvent, ProcessingEvent, ProgressEvent, StopEvent
+from agents.agent_q_a_streaming import ManualQueryStreamingAgent, InitialProcessingEvent, RetrievalEvent, ProcessingEvent, ProgressEvent, StopEvent
 
 async def run_agent_with_stream(agent, query: str):
     """Run the agent and yield streaming events."""

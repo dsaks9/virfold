@@ -8,7 +8,7 @@ from pathlib import Path
 project_root = str(Path(__file__).parent.parent)
 sys.path.append(project_root)
 
-from agent.agent_q_a import ManualQueryAgent
+from agents.agent_q_a import ManualQueryAgent
 
 # Create async function to run the agent
 async def run_agent_query(query: str):

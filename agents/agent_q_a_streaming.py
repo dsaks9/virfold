@@ -12,7 +12,7 @@ from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.core.workflow import Workflow, StartEvent, StopEvent, step, Context
 
 from retrievers.retriever_baseline import retrieve_pages
-from agent.prompts.prompts import SYSTEM_PROMPT_MANUAL_QA_AGENT, USER_PROMPT_MANUAL_MULTIMODAL_QA_AGENT
+from agents.prompts.prompts import SYSTEM_PROMPT_MANUAL_QA_AGENT, USER_PROMPT_MANUAL_MULTIMODAL_QA_AGENT
 
 # Custom events for streaming
 class InitialProcessingEvent(Event):

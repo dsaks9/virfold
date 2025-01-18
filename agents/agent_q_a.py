@@ -17,7 +17,7 @@ from llama_index.core.workflow import Workflow, StartEvent, StopEvent, step, Con
 
 from retrievers.retriever_baseline import retrieve_pages
 
-from agent.prompts.prompts import SYSTEM_PROMPT_MANUAL_QA_AGENT, USER_PROMPT_MANUAL_MULTIMODAL_QA_AGENT
+from agents.prompts.prompts import SYSTEM_PROMPT_MANUAL_QA_AGENT, USER_PROMPT_MANUAL_MULTIMODAL_QA_AGENT
 
 # from prompts.prompts import SYSTEM_PROMPT_SUBSIDY_REPORT_AGENT
 
