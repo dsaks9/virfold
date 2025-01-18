@@ -15,13 +15,19 @@ from agents.prompts.prompts import SYSTEM_PROMPT_INSULATION_AGENT, USER_PROMPT_I
 
 # Custom events for streaming
 class InitialProcessingEvent(Event):
-    msg: str
+    content: str
 
-class RetrievalEvent(Event):
-    msg: str
-    
-class ProcessingEvent(Event):
-    msg: str
+class ProvidedParametersEvent(Event):
+    content: str
+
+class RequiredParametersEvent(Event):
+    content: str
+
+class AssumptionsEvent(Event):
+    content: str
+
+class CalculationPlanEvent(Event):
+    content: str
 
 class ProgressEvent(Event):
     content: str
@@ -50,7 +56,7 @@ class InsulationAgent(Workflow):
     @step()
     async def agent_director(self, ev: StartEvent, ctx: Context) -> StopEvent:
         # Signal initial processing
-        ctx.write_event_to_stream(InitialProcessingEvent(msg="Starting query processing..."))
+        ctx.write_event_to_stream(InitialProcessingEvent(content="Starting query processing..."))
         
         # clear sources
         self.sources = []
@@ -63,29 +69,70 @@ class InsulationAgent(Workflow):
             design_parameters=design_parameters,
         )
 
-        # Signal processing before LLM work
-        ctx.write_event_to_stream(ProcessingEvent(msg="Processing retrieved information..."))
-
-                # get chat history and prepare for LLM call
+        # get chat history and prepare for LLM call
         user_msg = ChatMessage(role='user', content=user_prompt)
         self.memory.put(user_msg)
         chat_history = self.memory.get()
 
         # Stream LLM response
-        response_text = ""
+        full_response = ""  # Keep track of complete response
+        section_response = ""  # For section processing
+        current_section = None
+        
         async for response_chunk in await self.llm.astream_complete(
             prompt=user_prompt,
         ):
-            response_text += response_chunk.delta
-            # Stream just the delta/chunk
-            ctx.write_event_to_stream(ProgressEvent(content=response_chunk.delta))
+            delta = response_chunk.delta
+            full_response += delta  # Add to complete response
+            section_response += delta  # Add to section processing
+
+            # Check for section starts
+            if current_section is None:
+                for section in ["calculation_plan", "parameters_provided", "parameters_required", "assumptions"]:
+                    start_tag = f"<{section}>"
+                    if start_tag in section_response and section_response.find(start_tag) == section_response.rfind(start_tag):
+                        current_section = section
+                        # Find the start position after the tag
+                        start_pos = section_response.find(start_tag) + len(start_tag)
+                        # Reset the section content to what we have after the tag
+                        section_content = section_response[start_pos:]
+                        break
+            
+            # If we're in a section, check for end tag
+            if current_section:
+                end_tag = f"</{current_section}>"
+                if end_tag in section_response:
+                    # Find where the end tag starts
+                    end_pos = section_response.find(end_tag)
+                    # Get the content up to the end tag
+                    section_content = section_response[section_response.find(f"<{current_section}>") + len(f"<{current_section}>"):end_pos]
+                    
+                    # Emit the appropriate event
+                    event_map = {
+                        "calculation_plan": CalculationPlanEvent,
+                        "parameters_provided": ProvidedParametersEvent,
+                        "parameters_required": RequiredParametersEvent,
+                        "assumptions": AssumptionsEvent
+                    }
+                    
+                    if current_section in event_map:
+                        ctx.write_event_to_stream(event_map[current_section](content=section_content.strip()))
+                    
+                    # Remove the processed section from section_response to avoid duplicate processing
+                    section_with_tags = section_response[section_response.find(f"<{current_section}>"):end_pos + len(end_tag)]
+                    section_response = section_response.replace(section_with_tags, "")
+                    current_section = None
+            
+            # Always stream progress
+            ctx.write_event_to_stream(ProgressEvent(content=delta))
 
         # Store final response in memory
-        self.memory.put(response_text)
+        assistant_msg = ChatMessage(role='assistant', content=full_response)
+        self.memory.put(assistant_msg)
 
         return StopEvent(
             result={
-                "response": response_text,
+                "response": full_response,  # Return the complete response
                 "sources": [*self.sources]
             }
         ) 
@@ -121,14 +168,31 @@ if __name__ == "__main__":
                 """
         
         async for event in run_agent_with_stream(agent, query):
-            if isinstance(event, RetrievalEvent):
-                print("Retrieving relevant documents...")
-            elif isinstance(event, ProcessingEvent):
-                print("Processing retrieved information...")
+            if isinstance(event, ProvidedParametersEvent):
+                print("\n=== Parameters Provided ===")
+                print(event.content)
+                print("===========================\n")
+            elif isinstance(event, RequiredParametersEvent):
+                print("\n=== Parameters Required ===")
+                print(event.content)
+                print("===========================\n")
+            elif isinstance(event, AssumptionsEvent):
+                print("\n=== Assumptions ===")
+                print(event.content)
+                print("==================\n")
+            elif isinstance(event, CalculationPlanEvent):
+                print("\n=== Calculation Plan ===")
+                print(event.content)
+                print("======================\n")
+            elif isinstance(event, StopEvent):
+                print("\n=== Final Response ===")
+                print(event.result["response"])
+                print("======================\n")
             elif isinstance(event, ProgressEvent):
                 chunk = event.content
                 full_response += chunk
-                print("\n\n\n", f"Full Response: {full_response}", "\n\n\n")
+                # Uncomment to see streaming progress
+                # print("\n\n\n", f"Full Response: {full_response}", "\n\n\n")
 
     # Run the async main function
     asyncio.run(main())
