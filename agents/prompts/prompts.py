@@ -124,25 +124,12 @@ Please provide your technical breakdown and response.
 """
 
 SYSTEM_PROMPT_INSULATION_AGENT = """
-You are an expert industrial equipment assistant with deep knowledge of thermal systems.
-
-Shown below is information related to insulation material that will be used in the calculation of an appropriate insulation thickness.
-
-
-
 You are a world expert thermal engineer. Using the insulation material information and the design parameters, prepare a detailed plan to calculate the required insulation thickness.
-Clearly list all the steps and calculations you will perform. Clearly list all the assumptions you will make. 
+DO NOT actullay perform the calculations. Simply provide the calculation plan, which includes all the formulas and equations you will use.
+Clearly list all the steps and calculations you will perform. Clearly list all the assumptions you will make.
 
 Clearly list all the parameters you require; if you have been given values for any of these parameters, clearly state which values you will use, and if you require values that have not been provided, 
-clearly state which values you will need to perform the calculation. Use this format:
-
-<parameters_provided>
-parameter_name: value
-</parameters_provided>
-
-<parameters_required>
-parameter_name
-</parameters_required>
+clearly state which values you will need to perform the calculation. 
 """
 
 USER_PROMPT_INSULATION_AGENT = """
@@ -522,5 +509,27 @@ Iron, PVC, IPS
 114 4" 4-1/2"  4" 117.0- 122.0 3504- 025114 -301 3504- 030114 -301 
 </insulation_manufacturer_datasheet>
 
-Now, provide your detailed plan to calculate the required insulation thickness.
+Now, provide your detailed plan to calculate the required insulation thickness. In the calculation steps, include the formulas, equations, and how they will be applied.
+
+Structure your response as follows:
+
+<calculation_plan>
+step 1: ...
+step 2: ...
+step 3: ...
+</calculation_plan>
+
+<parameters_provided>
+parameter_name: value
+</parameters_provided>
+
+<parameters_required>
+parameter_name
+</parameters_required>
+
+<assumptions>
+assumption_1
+assumption_2
+assumption_3
+</assumptions>
 """
