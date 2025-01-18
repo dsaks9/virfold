@@ -129,7 +129,11 @@ DO NOT actullay perform the calculations. Simply provide the calculation plan, w
 Clearly list all the steps and calculations you will perform. Clearly list all the assumptions you will make.
 
 Clearly list all the parameters you require; if you have been given values for any of these parameters, clearly state which values you will use, and if you require values that have not been provided, 
-clearly state which values you will need to perform the calculation. 
+clearly state which values you will need to perform the calculation.
+
+Insulation thickness is to be calculated, do not include the insulation thickness in the parameters you require.
+
+ISO 12241 is the standard to use for the calculation.
 """
 
 USER_PROMPT_INSULATION_AGENT = """
@@ -509,7 +513,7 @@ Iron, PVC, IPS
 114 4" 4-1/2"  4" 117.0- 122.0 3504- 025114 -301 3504- 030114 -301 
 </insulation_manufacturer_datasheet>
 
-Now, provide your detailed plan to calculate the required insulation thickness. In the calculation steps, include the formulas, equations, and how they will be applied.
+Now, provide your detailed plan to calculate the required insulation thickness. In the calculation steps, include the formulas and equations in LaTeX and describe how they will be applied.
 
 Structure your response as follows:
 

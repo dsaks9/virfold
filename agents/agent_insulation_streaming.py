@@ -188,9 +188,9 @@ if __name__ == "__main__":
                 print("\n=== Final Response ===")
                 print(event.result["response"])
                 print("======================\n")
-            elif isinstance(event, ProgressEvent):
-                chunk = event.content
-                full_response += chunk
+            # elif isinstance(event, ProgressEvent):
+            #     chunk = event.content
+            #     full_response += chunk
                 # Uncomment to see streaming progress
                 # print("\n\n\n", f"Full Response: {full_response}", "\n\n\n")
 
