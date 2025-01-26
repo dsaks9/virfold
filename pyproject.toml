@@ -6,8 +6,9 @@ authors = ["dsaks9 <delonsaks@berkeley.edu>"]
 readme = "README.md"
 packages = [
     {include = "embed"},
-    {include = "agent"},
+    {include = "agents"},
     {include = "retrievers"},
+    {include = "ui"},
 ]
 
 [tool.poetry.dependencies]

@@ -30,8 +30,8 @@ class ExistingDockerRunner:
         exit_code, output = self.container.exec_run("python /script.py")
         return output.decode('utf-8')
 
-# Usage 
-container_name_or_id = "code-runner-container"
+# Specific container for development
+container_name_or_id = "code-runner-dev"
 runner = ExistingDockerRunner(container_name_or_id)
 
 

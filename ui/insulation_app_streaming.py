@@ -5,6 +5,18 @@ import sys
 import os
 import re
 
+# Add Phoenix
+# OpenTelemetry and instrumentation setup
+from opentelemetry.sdk import trace as trace_sdk
+from opentelemetry import trace as trace_api
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter as HTTPSpanExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
+from openinference.semconv.resource import ResourceAttributes
+from opentelemetry.sdk.resources import Resource
+from openinference.instrumentation import using_attributes
+
 # Add the project root to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
