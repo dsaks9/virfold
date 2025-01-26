@@ -1,0 +1,4 @@
+unidecode
+pandas[performance]
+pyarrow
+scipy

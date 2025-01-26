@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  code_execution:
+    container_name: code-runner-dev
+    build:
+      context: ../base/code_execution
+      dockerfile: Dockerfile
+    volumes:
+      - ../../agents:/app/cache/agents:ro
+    environment:
+      - PYTHONPATH=/app/cache
+    tty: true
+    stdin_open: true
