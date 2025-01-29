@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 # Output classes
 class CodeGen(BaseModel):
-    code: str = "The python code only without any preamble or postamble"
+    python_code: str = "The generated python code only without any preamble or postamble"
 
 class ExistingDockerRunner:
     def __init__(self, container_name_or_id):
@@ -36,14 +36,13 @@ runner = ExistingDockerRunner(container_name_or_id)
 
 
 # Tool functions
-def generate_code(
-        code: str) -> str:
-    """Use this tool to generate python code based on the user's input."""
+async def run_python_code(python_code: str) -> str:
+    """Use this tool to run python code."""
 
-    result = runner.run_python_code(code)
+    result = runner.run_python_code(python_code)
 
     json_data = {
-        "code": code,
+        "python_code": python_code,
         "result": result
     }
 

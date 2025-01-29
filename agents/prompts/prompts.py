@@ -591,6 +591,8 @@ engine = create_engine(
             print("\nRecent sensor readings:")
             print(df)
 </example_code>
+
+Now, analyze the user query and provide the most accurate and efficient code to solve the problem.
 """
 
 SYSTEM_PROMPT_CODE_REVIEW_DATA_ANALYST = f"""
