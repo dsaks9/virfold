@@ -11,7 +11,7 @@ from llama_index.llms.anthropic import Anthropic
 from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.core.workflow import Workflow, StartEvent, StopEvent, step, Context
 
-from agents.prompts.prompts import SYSTEM_PROMPT_INSULATION_AGENT, USER_PROMPT_INSULATION_AGENT, SYSTEM_PROMPT_CODE_GENERATION, SYSTEM_PROMPT_CODE_GENERATION_REVIEW
+from agents.prompts.prompts import SYSTEM_PROMPT_INSULATION_AGENT, USER_PROMPT_INSULATION_AGENT, SYSTEM_PROMPT_CODE_GENERATION_CALCULATION_PLAN, SYSTEM_PROMPT_CODE_GENERATION_REVIEW_CALCULATION_PLAN
 
 from agents.tools.tools_agent_insulation import generate_code, CodeGen
 
@@ -118,7 +118,7 @@ class InsulationAgent(Workflow):
             model=model, 
             max_tokens=4096,
             api_key=os.getenv("ANTHROPIC_API_KEY"),
-            system_prompt=SYSTEM_PROMPT_CODE_GENERATION
+            system_prompt=SYSTEM_PROMPT_CODE_GENERATION_CALCULATION_PLAN
         )
 
         model = 'claude-3-5-sonnet-latest'
@@ -126,7 +126,7 @@ class InsulationAgent(Workflow):
             model=model, 
             max_tokens=4096,
             api_key=os.getenv("ANTHROPIC_API_KEY"),
-            system_prompt=SYSTEM_PROMPT_CODE_GENERATION_REVIEW
+            system_prompt=SYSTEM_PROMPT_CODE_GENERATION_REVIEW_CALCULATION_PLAN
         )
 
         # initialize the tools
@@ -337,7 +337,7 @@ class InsulationAgent(Workflow):
     @step()
     async def validate_code(self, ev: ValidationEvent, ctx: Context) -> ToolCallEvent | StopEvent:
         # add in code review prompt
-        code_review_messages = [ChatMessage(role='system', content=SYSTEM_PROMPT_CODE_GENERATION_REVIEW)]
+        code_review_messages = [ChatMessage(role='system', content=SYSTEM_PROMPT_CODE_GENERATION_REVIEW_CALCULATION_PLAN)]
         code_review_messages.extend(ev.validation_input)
 
         # this step is where the code review happens
