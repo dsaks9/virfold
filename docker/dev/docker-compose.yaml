@@ -1,13 +1,37 @@
 version: '3.8'
 
 services:
+  data_analyst_api:
+    container_name: data-analyst-api
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    volumes:
+      - ../../agents:/app/cache/agents:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PYTHONPATH=/app:/app/cache
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "8000:8000"
+    depends_on:
+      timeseriesdb:
+        condition: service_healthy
+      code_execution:
+        condition: service_started
+    networks:
+      - app-network
+
   code_execution:
     container_name: code-runner-dev
     build:
       context: ../base/code_execution
       dockerfile: Dockerfile
-    volumes:
-      - ../../agents:/app/cache/agents:ro
     environment:
       - PYTHONPATH=/app/cache
       - DB_HOST=${DB_HOST}
@@ -20,8 +44,6 @@ services:
         condition: service_healthy
     networks:
       - app-network
-    tty: true
-    stdin_open: true
 
   timeseriesdb:
     container_name: timeseriesdb
