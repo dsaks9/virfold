@@ -10,5 +10,44 @@ services:
       - ../../agents:/app/cache/agents:ro
     environment:
       - PYTHONPATH=/app/cache
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      timeseriesdb:
+        condition: service_healthy
+    networks:
+      - app-network
     tty: true
     stdin_open: true
+
+  timeseriesdb:
+    container_name: timeseriesdb
+    build:
+      context: ../base/ts_database
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  timescale_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

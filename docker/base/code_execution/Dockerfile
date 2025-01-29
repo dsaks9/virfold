@@ -13,6 +13,9 @@ COPY requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
+# Copy the health check script
+COPY db_health_check.py /app/db_health_check.py
+
 # Copy the entrypoint script into the container
 COPY entrypoint.sh /app/entrypoint.sh
 
