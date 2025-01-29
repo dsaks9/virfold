@@ -38,7 +38,7 @@ runner = ExistingDockerRunner(container_name_or_id)
 # Tool functions
 def generate_code(
         code: str) -> str:
-    """Use this tool to generate python code and the reasoning behind the code based on the user's input."""
+    """Use this tool to generate python code based on the user's input."""
 
     result = runner.run_python_code(code)
 
