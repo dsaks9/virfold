@@ -1,53 +1,100 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState, useEffect, FormEvent, ChangeEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-// Hardcoded message history
-const initialMessages = [
-  { id: 1, text: "Welcome to the Sensor Dashboard! How can I assist you today?", sender: "bot" },
-  { id: 2, text: "What's the current temperature in the warehouse?", sender: "user" },
-  { id: 3, text: "The current average temperature across all sensors is 24.5°C.", sender: "bot" },
-  { id: 4, text: "Are there any unusual humidity readings?", sender: "user" },
-  {
-    id: 5,
-    text: "Sensor 2 is reporting slightly elevated humidity levels. Current reading is 68%, which is 10% above the average.",
-    sender: "bot",
-  },
-]
+interface Message {
+  id: number
+  text: string
+  sender: "user" | "bot"
+}
+
+interface ChatResponse {
+  session_id: string
+  response: string
+}
 
 export default function MessageBox() {
-  const [messages, setMessages] = useState(initialMessages)
+  const [messages, setMessages] = useState<Message[]>([
+    { id: 1, text: "Welcome to the Sensor Dashboard! How can I assist you today?", sender: "bot" }
+  ])
   const [input, setInput] = useState("")
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Load session ID from localStorage on mount
+  useEffect(() => {
+    const savedSessionId = localStorage.getItem('chatSessionId')
+    if (savedSessionId) {
+      setSessionId(savedSessionId)
+    }
+  }, [])
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (input.trim()) {
-      // Add user message
-      setMessages((prev) => [...prev, { id: prev.length + 1, text: input, sender: "user" }])
+    if (input.trim() && !isLoading) {
+      setIsLoading(true)
+      
+      // Add user message immediately
+      const userMessage: Message = {
+        id: messages.length + 1,
+        text: input.trim(),
+        sender: "user"
+      }
+      setMessages((prev: Message[]) => [...prev, userMessage])
       setInput("")
 
-      // TODO: Implement API call here
-      // For now, we'll just add a dummy response
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: prev.length + 1,
-            text: "I've received your message. Once connected to an AI, I'll provide a relevant response.",
-            sender: "bot",
+      try {
+        // Send message to API
+        const response = await fetch('http://localhost:8000/data-analyst/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-        ])
-      }, 500)
+          body: JSON.stringify({
+            message: userMessage.text,
+            session_id: sessionId
+          })
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to get response from API')
+        }
+
+        const data: ChatResponse = await response.json()
+        
+        // Save session ID if it's new
+        if (!sessionId) {
+          setSessionId(data.session_id)
+          localStorage.setItem('chatSessionId', data.session_id)
+        }
+
+        // Add bot response
+        setMessages((prev: Message[]) => [...prev, {
+          id: prev.length + 1,
+          text: data.response,
+          sender: "bot"
+        }])
+      } catch (error) {
+        console.error('Error sending message:', error)
+        // Add error message
+        setMessages((prev: Message[]) => [...prev, {
+          id: prev.length + 1,
+          text: "Sorry, I encountered an error processing your request. Please try again.",
+          sender: "bot"
+        }])
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
   return (
     <div className="flex flex-col h-full">
       <ScrollArea className="flex-grow mb-4">
-        {messages.map((message) => (
+        {messages.map((message: Message) => (
           <div
             key={message.id}
             className={`mb-2 p-2 rounded-lg ${
@@ -57,16 +104,30 @@ export default function MessageBox() {
             {message.text}
           </div>
         ))}
+        {isLoading && (
+          <div className="mb-2 p-2 rounded-lg bg-gray-700 text-cyan-400 max-w-[80%]">
+            Thinking...
+          </div>
+        )}
       </ScrollArea>
       <form onSubmit={handleSubmit} className="flex gap-2">
         <Input
           type="text"
           placeholder="Type your query here..."
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+          disabled={isLoading}
           className="flex-grow bg-gray-800 text-white border-gray-700 focus:border-cyan-400"
         />
-        <Button type="submit" className="bg-cyan-500 text-white hover:bg-cyan-600">
+        <Button 
+          type="submit" 
+          disabled={isLoading}
+          className={`${
+            isLoading 
+              ? 'bg-gray-600 cursor-not-allowed' 
+              : 'bg-cyan-500 hover:bg-cyan-600'
+          } text-white`}
+        >
           Send
         </Button>
       </form>

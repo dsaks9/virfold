@@ -20,11 +20,12 @@ from routers import data_analyst
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Phoenix configuration
-os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = "api_key=3d95169888287871fcd:7bdc2f8"
-os.environ["PHOENIX_CLIENT_HEADERS"] = "api_key=3d95169888287871fcd:7bdc2f8"
+os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = "api_key=079a4421d673df9aa72:aad28a7"
+os.environ["PHOENIX_CLIENT_HEADERS"] = "api_key=079a4421d673df9aa72:aad28a7"
 os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
-os.environ['PHOENIX_PROJECT_NAME'] = "app_api"
+os.environ['PHOENIX_PROJECT_NAME'] = "api_data_analyst"
 
 span_phoenix_processor = SimpleSpanProcessor(HTTPSpanExporter(endpoint="https://app.phoenix.arize.com/v1/traces"))
 
