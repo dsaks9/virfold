@@ -1,28 +1,21 @@
-FROM python:3.12-slim
+FROM node:20-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Copy package files
+COPY package.json ./
 
-# Copy requirements first to leverage Docker cache
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install dependencies with legacy peer deps
+RUN npm install --legacy-peer-deps
 
-# Create necessary directories
-RUN mkdir -p routers
+# Copy the rest of the application code
+COPY . .
 
-# Copy application code
-COPY main.py .
-COPY routers/ routers/
-
-# Add app directory to Python path
-ENV PYTHONPATH=/app:/app/cache
+# Build the application
+RUN npm run build
 
 # Expose port
-EXPOSE 8000
+EXPOSE 3000
 
-# Run FastAPI with uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"] 
+# Start the application in development mode
+CMD ["npm", "run", "dev"] 

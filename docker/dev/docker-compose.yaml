@@ -1,10 +1,29 @@
 version: '3.8'
 
 services:
+  react_app:
+    container_name: react-app
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_TS_API_URL=http://localhost:8001
+    depends_on:
+      - timeseries_api
+    networks:
+      - app-network
+
   data_analyst_api:
     container_name: data-analyst-api
     build:
-      context: ./app
+      context: ./api
       dockerfile: Dockerfile
     volumes:
       - ../../agents:/app/cache/agents:ro
@@ -24,6 +43,25 @@ services:
         condition: service_healthy
       code_execution:
         condition: service_started
+    networks:
+      - app-network
+
+  timeseries_api:
+    container_name: timeseries-api
+    build:
+      context: ./ts_api
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "8001:8001"
+    depends_on:
+      timeseriesdb:
+        condition: service_healthy
     networks:
       - app-network
 
