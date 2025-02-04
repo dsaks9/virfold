@@ -15,34 +15,6 @@ from agents.prompts.prompts import SYSTEM_PROMPT_CODE_GENERATION_DATA_ANALYST, S
 
 from agents.tools.tool_code_runner import run_python_code, CodeGen
 
-# # Add Phoenix
-# # OpenTelemetry and instrumentation setup
-# from opentelemetry.sdk import trace as trace_sdk
-# from opentelemetry import trace as trace_api
-# from opentelemetry.sdk.trace.export import SimpleSpanProcessor
-# from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter as HTTPSpanExporter
-# from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-# from openinference.instrumentation.llama_index import LlamaIndexInstrumentor
-# from openinference.semconv.resource import ResourceAttributes
-# from opentelemetry.sdk.resources import Resource
-# from openinference.instrumentation import using_attributes
-
-# os.environ["OTEL_EXPORTER_OTLP_HEADERS"] = "api_key=079a4421d673df9aa72:aad28a7"
-# os.environ["PHOENIX_CLIENT_HEADERS"] = "api_key=079a4421d673df9aa72:aad28a7"
-# os.environ["PHOENIX_COLLECTOR_ENDPOINT"] = "https://app.phoenix.arize.com"
-# os.environ['PHOENIX_PROJECT_NAME'] = "agent_data_analyst"
-
-# span_phoenix_processor = SimpleSpanProcessor(HTTPSpanExporter(endpoint="https://app.phoenix.arize.com/v1/traces"))
-
-# # Add them to the tracer
-# resource = Resource(attributes={ResourceAttributes.PROJECT_NAME: os.environ['PHOENIX_PROJECT_NAME']})
-# tracer_provider = trace_sdk.TracerProvider(resource=resource)
-# tracer_provider.add_span_processor(span_processor=span_phoenix_processor)
-
-
-# # Instrument the application
-# LlamaIndexInstrumentor().instrument(tracer_provider=tracer_provider)
-
 nest_asyncio.apply()  # Allows nested event loops
 
 class InputEvent(Event):
