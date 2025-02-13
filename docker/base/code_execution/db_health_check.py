@@ -1,11 +1,11 @@
 import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import os
 import time
 import sys
 
 def test_db_connection(max_retries=5, retry_delay=5):
-    """Test connection to the TimescaleDB database with retries"""
+    """Test basic connection to the TimescaleDB database"""
     
     # Create database connection parameters
     db_params = {
@@ -26,20 +26,12 @@ def test_db_connection(max_retries=5, retry_delay=5):
                 f"{db_params['host']}:{db_params['port']}/{db_params['database']}"
             )
             
-            # Test query
-            query = """
-            SELECT time, sensor_id, temperature, humidity 
-            FROM sensor_data 
-            WHERE time >= NOW() - INTERVAL '6 hours'
-            ORDER BY time DESC
-            LIMIT 5;
-            """
-            
-            df = pd.read_sql(query, engine)
-            print("\nDatabase connection successful!")
-            print("\nRecent sensor readings:")
-            print(df)
-            return True
+            # Just test basic connectivity
+            with engine.connect() as connection:
+                result = connection.execute(text("SELECT 1"))
+                result.scalar()
+                print("Database connection successful!")
+                return True
             
         except Exception as e:
             print(f"\nAttempt {attempt + 1}/{max_retries} failed:")
@@ -54,4 +46,4 @@ def test_db_connection(max_retries=5, retry_delay=5):
 if __name__ == "__main__":
     success = test_db_connection()
     if not success:
-        sys.exit(1) 
+        sys.exit(1)

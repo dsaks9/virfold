@@ -14,9 +14,12 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_TS_API_URL=http://localhost:8001
+      - NEXT_PUBLIC_TS_API_URL=http://ec2-54-206-50-237.ap-southeast-2.compute.amazonaws.com:8001
+      - NEXT_PUBLIC_DATA_ANALYST_API_URL=http://ec2-54-206-50-237.ap-southeast-2.compute.amazonaws.com:8000
+      - NEXT_PUBLIC_API_BASE_URL=http://ec2-54-206-50-237.ap-southeast-2.compute.amazonaws.com
     depends_on:
       - timeseries_api
+      - data_analyst_api
     networks:
       - app-network
 
@@ -42,9 +45,16 @@ services:
       timeseriesdb:
         condition: service_healthy
       code_execution:
-        condition: service_started
+        condition: service_healthy
     networks:
       - app-network
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "python", "health_check.py"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   timeseries_api:
     container_name: timeseries-api
@@ -64,6 +74,13 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "python", "health_check.py"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   code_execution:
     container_name: code-runner-dev
@@ -82,6 +99,13 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "python", "/app/db_health_check.py"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   timeseriesdb:
     container_name: timeseriesdb
@@ -103,6 +127,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
 volumes:
   timescale_data:

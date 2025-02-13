@@ -21,17 +21,29 @@ const sensorColors = {
 
 const charts: { [key: string]: Chart } = {}
 
-// In Docker, we need to use the service name instead of localhost
-const API_URL = process.env.NEXT_PUBLIC_TS_API_URL || 'http://timeseries-api:8001'
+const API_URL = process.env.NEXT_PUBLIC_TS_API_URL
 
 async function fetchSensorData(): Promise<SensorDataMap> {
+  if (!API_URL) {
+    throw new Error('API URL is not configured')
+  }
+
   try {
-    console.log('Fetching sensor data from:', `${API_URL}/sensors/data?interval=5 minutes`)
-    const response = await fetch(`${API_URL}/sensors/data?interval=5 minutes`, {
+    console.log('Fetching sensor data from:', `${API_URL}/sensors/data?interval=5%20minutes`)
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+
+    const response = await fetch(`${API_URL}/sensors/data?interval=5%20minutes`, {
       headers: {
         'Accept': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
       },
+      signal: controller.signal,
+      mode: 'cors',
     })
+    
+    clearTimeout(timeoutId)
     
     if (!response.ok) {
       const errorText = await response.text()
@@ -48,8 +60,14 @@ async function fetchSensorData(): Promise<SensorDataMap> {
     
     return data
   } catch (error) {
-    console.error('Error fetching sensor data:', error)
-    throw error
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out after 10 seconds')
+      }
+      console.error('Error fetching sensor data:', error)
+      throw error
+    }
+    throw new Error('An unknown error occurred')
   }
 }
 

@@ -9,13 +9,20 @@ RUN apt-get update && apt-get install -y \
 
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt sqlalchemy psycopg2-binary
+
+# Copy health check script
+COPY health_check.py .
 
 # Copy application code
 COPY . .
 
 # Expose port
 EXPOSE 8001
+
+# Add health check
+HEALTHCHECK --interval=10s --timeout=10s --start-period=30s --retries=3 \
+    CMD python health_check.py
 
 # Run FastAPI with uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"] 

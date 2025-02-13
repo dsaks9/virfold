@@ -48,7 +48,7 @@ export default function MessageBox() {
 
       try {
         // Send message to API
-        const response = await fetch('http://localhost:8000/data-analyst/chat', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_DATA_ANALYST_API_URL}/data-analyst/chat`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

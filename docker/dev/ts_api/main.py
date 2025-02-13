@@ -8,8 +8,11 @@ import logging
 from typing import Optional, List, Dict
 from pydantic import BaseModel
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
+# Set up logging with more detailed information
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
@@ -18,24 +21,45 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS
+# Configure CORS with specific origins and detailed logging
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust in production
-    allow_credentials=True,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://ec2-54-206-50-237.ap-southeast-2.compute.amazonaws.com:3000",
+        "*",  # Temporarily allow all origins for debugging
+    ],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def log_requests(request, call_next):
+    logger.info(f"Request: {request.method} {request.url}")
+    try:
+        response = await call_next(request)
+        logger.info(f"Response: {response.status_code}")
+        return response
+    except Exception as e:
+        logger.error(f"Error processing request: {str(e)}")
+        raise
+
 def get_db_connection():
     """Create a connection to the database."""
-    return psycopg2.connect(
-        dbname=os.getenv("POSTGRES_DB"),
-        user=os.getenv("POSTGRES_USER"),
-        password=os.getenv("POSTGRES_PASSWORD"),
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT")
-    )
+    try:
+        conn = psycopg2.connect(
+            dbname=os.getenv("POSTGRES_DB"),
+            user=os.getenv("POSTGRES_USER"),
+            password=os.getenv("POSTGRES_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT")
+        )
+        logger.info("Database connection successful")
+        return conn
+    except Exception as e:
+        logger.error(f"Database connection failed: {str(e)}")
+        raise
 
 class SensorData(BaseModel):
     time: str

@@ -1,9 +1,14 @@
 #!/bin/bash
 set -e
 
-# Run the database health check
-echo "Running database health check..."
-python /app/db_health_check.py
+echo "Waiting for database to be fully ready..."
+sleep 30  # Give the database plenty of time to initialize
 
-# Keep the container running
-tail -f /dev/null
+echo "Running health check..."
+if ! python /app/db_health_check.py; then
+    echo "Health check failed - exiting"
+    exit 1
+fi
+
+echo "Health check passed - keeping container running"
+exec tail -f /dev/null
