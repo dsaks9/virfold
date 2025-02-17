@@ -7,7 +7,7 @@ try {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: 'ai/experimental/dashboard',
+  basePath: '/ai/experimental/dashboard',
   eslint: {
     ignoreDuringBuilds: true,
   },
