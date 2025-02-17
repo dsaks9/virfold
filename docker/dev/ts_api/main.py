@@ -7,6 +7,7 @@ import os
 import logging
 from typing import Optional, List, Dict
 from pydantic import BaseModel
+import pytz
 
 # Set up logging with more detailed information
 logging.basicConfig(
@@ -70,6 +71,10 @@ class SensorResponse(BaseModel):
     sensor_id: int
     data: List[SensorData]
 
+def get_current_time_utc():
+    """Get current time in UTC."""
+    return datetime.now(pytz.UTC)
+
 @app.get("/sensors", response_model=List[int])
 async def list_sensors():
     """Get a list of all sensor IDs."""
@@ -104,7 +109,7 @@ async def get_sensor_data(
                             AVG(temperature) as avg_temp,
                             AVG(humidity) as avg_humidity
                         FROM sensor_data
-                        WHERE time >= NOW() - INTERVAL %s
+                        WHERE time >= (NOW() AT TIME ZONE 'UTC') - INTERVAL %s
                         GROUP BY sensor_id, bucket
                         ORDER BY bucket ASC
                     )
@@ -127,6 +132,10 @@ async def get_sensor_data(
                     
                     if sensor_key not in sensor_data:
                         sensor_data[sensor_key] = []
+                    
+                    # Ensure time is in UTC
+                    if time.tzinfo is None:
+                        time = pytz.UTC.localize(time)
                     
                     sensor_data[sensor_key].append(SensorData(
                         time=time.strftime("%H:%M"),
@@ -163,7 +172,7 @@ async def get_single_sensor_data(
                     FROM sensor_data
                     WHERE 
                         sensor_id = %s AND
-                        time >= NOW() - INTERVAL %s
+                        time >= (NOW() AT TIME ZONE 'UTC') - INTERVAL %s
                     GROUP BY bucket
                     ORDER BY bucket ASC;
                 """

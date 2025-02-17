@@ -17,6 +17,9 @@ COPY health_check.py .
 # Copy application code
 COPY . .
 
+# Make start script executable
+RUN chmod +x start.sh
+
 # Expose port
 EXPOSE 8001
 
@@ -24,5 +27,5 @@ EXPOSE 8001
 HEALTHCHECK --interval=10s --timeout=10s --start-period=30s --retries=3 \
     CMD python health_check.py
 
-# Run FastAPI with uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"] 
+# Run the start script
+CMD ["./start.sh"] 
